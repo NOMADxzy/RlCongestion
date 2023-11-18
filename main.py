@@ -10,10 +10,10 @@ import gc
 import train
 import buffer
 
-env = gym.make('BipedalWalker-v2')
+env = gym.make('BipedalWalker-v3')
 # env = gym.make('Pendulum-v0')
 
-MAX_EPISODES = 5000
+MAX_EPISODES = 30000
 MAX_STEPS = 1000
 MAX_BUFFER = 1000000
 MAX_TOTAL_REWARD = 300
@@ -21,16 +21,17 @@ S_DIM = env.observation_space.shape[0]
 A_DIM = env.action_space.shape[0]
 A_MAX = env.action_space.high[0]
 
-print ' State Dimensions :- ', S_DIM
-print ' Action Dimensions :- ', A_DIM
-print ' Action Max :- ', A_MAX
+print (' State Dimensions :- ', S_DIM)
+print (' Action Dimensions :- ', A_DIM)
+print (' Action Max :- ', A_MAX)
 
 ram = buffer.MemoryBuffer(MAX_BUFFER)
 trainer = train.Trainer(S_DIM, A_DIM, A_MAX, ram)
+trainer.load_models(5100)
 
 for _ep in range(MAX_EPISODES):
 	observation = env.reset()
-	print 'EPISODE :- ', _ep
+	print ('EPISODE :- ', _ep)
 	for r in range(MAX_STEPS):
 		env.render()
 		state = np.float32(observation)
@@ -72,4 +73,4 @@ for _ep in range(MAX_EPISODES):
 		trainer.save_models(_ep)
 
 
-print 'Completed episodes'
+print ('Completed episodes')

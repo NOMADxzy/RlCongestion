@@ -27,7 +27,7 @@ class MemoryBuffer:
 
 		return s_arr, a_arr, r_arr, s1_arr
 
-	def len(self):
+	def size(self):
 		return self.len
 
 	def add(self, s, a, r, s1):

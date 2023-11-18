@@ -3,7 +3,7 @@ import torch.nn as nn
 import torch.nn.functional as F
 import numpy as np
 
-EPS = 0.003
+EPS = 0.01
 
 def fanin_init(size, fanin=None):
 	fanin = fanin or size[0]
@@ -71,15 +71,16 @@ class Actor(nn.Module):
 		self.action_lim = action_lim
 
 		self.fc1 = nn.Linear(state_dim,256)
-		self.fc1.weight.data = fanin_init(self.fc1.weight.data.size())
+		self.fc1.weight.data = fanin_init(self.fc1.weight.data.size()) # state维度 x 256
 
 		self.fc2 = nn.Linear(256,128)
-		self.fc2.weight.data = fanin_init(self.fc2.weight.data.size())
+		self.fc2.weight.data = fanin_init(self.fc2.weight.data.size()) #
 
 		self.fc3 = nn.Linear(128,64)
 		self.fc3.weight.data = fanin_init(self.fc3.weight.data.size())
 
 		self.fc4 = nn.Linear(64,action_dim)
+		# self.fc4 = torch.sigmoid()
 		self.fc4.weight.data.uniform_(-EPS,EPS)
 
 	def forward(self, state):
@@ -98,7 +99,7 @@ class Actor(nn.Module):
 
 		action = action * self.action_lim
 
-		return action
+		return torch.tanh(action)
 
 
 
