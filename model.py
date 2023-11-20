@@ -12,7 +12,7 @@ def fanin_init(size, fanin=None):
 
 class Critic(nn.Module):
 
-	def __init__(self, state_dim, action_dim):
+	def __init__(self, state_dim, action_dim, hidden_size=64):
 		"""
 		:param state_dim: Dimension of input state (int)
 		:param action_dim: Dimension of input action (int)
@@ -22,6 +22,7 @@ class Critic(nn.Module):
 
 		self.state_dim = state_dim
 		self.action_dim = action_dim
+		self.hidden_size = hidden_size
 
 		self.fcs1 = nn.Linear(state_dim,256)
 		self.fcs1.weight.data = fanin_init(self.fcs1.weight.data.size())
@@ -99,7 +100,7 @@ class Actor(nn.Module):
 
 		action = action * self.action_lim
 
-		return torch.tanh(action)
+		return action
 
 
 

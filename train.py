@@ -1,4 +1,6 @@
 from __future__ import division
+
+import numpy
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
@@ -18,7 +20,7 @@ TAU = 0.001
 
 class Trainer:
 
-	def __init__(self, state_dim, action_dim, action_lim, ram):
+	def __init__(self, state_dim, state_len, action_dim, action_lim, ram):
 		"""
 		:param state_dim: Dimensions of state (int)
 		:param action_dim: Dimension of action (int)
@@ -26,7 +28,7 @@ class Trainer:
 		:param ram: replay memory buffer object
 		:return:
 		"""
-		self.state_dim = state_dim
+		self.state_dim = state_dim*state_len
 		self.action_dim = action_dim
 		self.action_lim = action_lim
 		self.ram = ram
@@ -60,10 +62,14 @@ class Trainer:
 		:param state: state (Numpy array)
 		:return: sampled action (Numpy array)
 		"""
-		state = Variable(torch.from_numpy(state))
-		action = self.actor.forward(state).detach()
+		state = Variable(torch.from_numpy(state).view(-1))
+		action = self.actor.forward(state)
+
+		probs = F.softmax(action,dim=0)
+		action = action.detach()
+		a_idx = probs.detach().numpy().argmax()
 		new_action = action.data.numpy() + (self.noise.sample() * self.action_lim)
-		return new_action
+		return new_action, a_idx
 
 	def optimize(self):
 		"""
@@ -71,10 +77,16 @@ class Trainer:
 		:return:
 		"""
 		s1,a1,r1,s2 = self.ram.sample(BATCH_SIZE)
+		batch = s1[0]
 
+		s2 = s2[:, np.newaxis]
+		s2 = np.hstack((s1[:,1:,:], s2))
+		s1 = s1.reshape((-1,self.state_dim))
+		s2 = s2.reshape((-1,self.state_dim))
 		s1 = Variable(torch.from_numpy(s1))
 		a1 = Variable(torch.from_numpy(a1))
 		r1 = Variable(torch.from_numpy(r1))
+
 		s2 = Variable(torch.from_numpy(s2))
 
 		# ---------------------- optimize critic ----------------------
