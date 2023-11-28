@@ -7,7 +7,9 @@ import gc, grpc
 
 import train
 import buffer
-import StateAndReward_pb2, StateAndReward_pb2_grpc
+import grpc_pb.StateAndReward_pb2 as StateAndReward_pb2
+import grpc_pb.StateAndReward_pb2_grpc as StateAndReward_pb2_grpc
+import matplotlib.pyplot as plt
 
 # env = gym.make('Pendulum-v0')
 
@@ -17,7 +19,7 @@ MAX_BUFFER = 1000000
 MAX_TOTAL_REWARD = 300
 S_DIM = 1
 S_LEN = 8
-A_DIM = 9
+A_DIM = 13
 A_MAX = 1
 STATE_LEN = 8
 
@@ -29,7 +31,7 @@ ram = buffer.MemoryBuffer(MAX_BUFFER)
 trainer = train.Trainer(S_DIM, S_LEN, A_DIM, A_MAX, ram)
 
 
-# trainer.load_models(100)
+# trainer.load_models(2800,s=1,v=15)
 
 class RLmethods(StateAndReward_pb2_grpc.acerServiceServicer):
 
@@ -44,8 +46,10 @@ class RLmethods(StateAndReward_pb2_grpc.acerServiceServicer):
         # 绘图
         self.step_reward = []
         self.avg_acc_reward = []
-        self.rtt_list = []
+        self.throughput_list = []
         self.latency_list = []
+        self.plot_step = 0
+        self.plt_interval = 1
 
     def GetExplorationAction(self, request, context):
         reward = request.reward
@@ -75,17 +79,50 @@ class RLmethods(StateAndReward_pb2_grpc.acerServiceServicer):
             if self.step % 10000 == 0:
                 trainer.save_models(int(self.step / 100))
 
-        return StateAndReward_pb2.Action(action=float(a_idx))
+        return StateAndReward_pb2.Action(action=a_idx, action_dim=A_DIM // 2)
 
-    def update_reward(self, reward, latency, rtt, step):
+    def UpdateMetric(self, request, context):
+        metrics = request.metrics
+        self.update_reward(reward=metrics[0], latency=metrics[1], throughput=metrics[2])
+        print("got metrics :", metrics)
+        return StateAndReward_pb2.Res(r=float(self.plot_step))
+
+    def update_reward(self, reward, latency, throughput):
         self.step_reward.append(reward)
         self.latency_list.append(latency)
-        self.rtt_list.append(rtt)
+        self.throughput_list.append(throughput)
 
-        if step == 0:
+        if self.plot_step == 0:
             self.avg_acc_reward.append(reward)
         else:
-            self.avg_acc_reward.append((step * self.avg_acc_reward[-1] + reward) / (step + 1))
+            self.avg_acc_reward.append((self.plot_step * self.avg_acc_reward[-1] + reward) / (self.plot_step + 1))
+        self.plot_step += 1
+        if self.plot_step % 1000 == 0:
+            self.plot_all()
+
+    def plot_all(self):
+        self.sample_plot(self.step_reward, self.plt_interval, "step_reward")
+        self.sample_plot(self.avg_acc_reward, self.plt_interval, "avg_acc_reward")
+        self.sample_plot(self.throughput_list, self.plt_interval, "throughput")
+        self.sample_plot(self.latency_list, self.plt_interval, "latency")
+
+    def sample_plot(self, vals, interval, msg):  # 按interval采样vals并绘图
+        plt.figure()
+        new_vals = self.resize(vals, interval)
+        num_of_x = len(new_vals)
+        plt.plot([i * interval for i in range(num_of_x)],
+                 new_vals, label=msg)
+        plt.legend()
+        plt.xlabel("step")
+        plt.ylabel(msg)
+        plt.savefig('./results/' + msg + '.png')
+
+    def resize(self, val_list, a):
+        new_list = []
+        for idx, e in enumerate(val_list):
+            if idx % a == 0:
+                new_list.append(e)
+        return new_list
 
 
 if __name__ == '__main__':

@@ -19,7 +19,7 @@ DESCRIPTOR = _descriptor.FileDescriptor(
   syntax='proto3',
   serialized_options=b'Z\014./;rpcClient',
   create_key=_descriptor._internal_create_key,
-  serialized_pb=b'\n\x14StateAndReward.proto\x12\x07service\",\n\x0bStateReward\x12\r\n\x05state\x18\x01 \x03(\x02\x12\x0e\n\x06reward\x18\x02 \x01(\x02\"\x18\n\x06\x41\x63tion\x12\x0e\n\x06\x61\x63tion\x18\x01 \x01(\x02\x32L\n\x0b\x61\x63\x65rService\x12=\n\x14GetExplorationAction\x12\x14.service.StateReward\x1a\x0f.service.ActionB\x0eZ\x0c./;rpcClientb\x06proto3'
+  serialized_pb=b'\n\x14StateAndReward.proto\x12\x07service\",\n\x0bStateReward\x12\r\n\x05state\x18\x01 \x03(\x02\x12\x0e\n\x06reward\x18\x02 \x01(\x02\",\n\x06\x41\x63tion\x12\x0e\n\x06\x61\x63tion\x18\x01 \x01(\x05\x12\x12\n\naction_dim\x18\x02 \x01(\x05\"\x19\n\x06Metric\x12\x0f\n\x07metrics\x18\x01 \x03(\x02\"\x10\n\x03Res\x12\t\n\x01r\x18\x01 \x01(\x02\x32{\n\x0b\x61\x63\x65rService\x12=\n\x14GetExplorationAction\x12\x14.service.StateReward\x1a\x0f.service.Action\x12-\n\x0cUpdateMetric\x12\x0f.service.Metric\x1a\x0c.service.ResB\x0eZ\x0c./;rpcClientb\x06proto3'
 )
 
 
@@ -74,6 +74,77 @@ _ACTION = _descriptor.Descriptor(
   fields=[
     _descriptor.FieldDescriptor(
       name='action', full_name='service.Action.action', index=0,
+      number=1, type=5, cpp_type=1, label=1,
+      has_default_value=False, default_value=0,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
+    _descriptor.FieldDescriptor(
+      name='action_dim', full_name='service.Action.action_dim', index=1,
+      number=2, type=5, cpp_type=1, label=1,
+      has_default_value=False, default_value=0,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
+  ],
+  extensions=[
+  ],
+  nested_types=[],
+  enum_types=[
+  ],
+  serialized_options=None,
+  is_extendable=False,
+  syntax='proto3',
+  extension_ranges=[],
+  oneofs=[
+  ],
+  serialized_start=79,
+  serialized_end=123,
+)
+
+
+_METRIC = _descriptor.Descriptor(
+  name='Metric',
+  full_name='service.Metric',
+  filename=None,
+  file=DESCRIPTOR,
+  containing_type=None,
+  create_key=_descriptor._internal_create_key,
+  fields=[
+    _descriptor.FieldDescriptor(
+      name='metrics', full_name='service.Metric.metrics', index=0,
+      number=1, type=2, cpp_type=6, label=3,
+      has_default_value=False, default_value=[],
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
+  ],
+  extensions=[
+  ],
+  nested_types=[],
+  enum_types=[
+  ],
+  serialized_options=None,
+  is_extendable=False,
+  syntax='proto3',
+  extension_ranges=[],
+  oneofs=[
+  ],
+  serialized_start=125,
+  serialized_end=150,
+)
+
+
+_RES = _descriptor.Descriptor(
+  name='Res',
+  full_name='service.Res',
+  filename=None,
+  file=DESCRIPTOR,
+  containing_type=None,
+  create_key=_descriptor._internal_create_key,
+  fields=[
+    _descriptor.FieldDescriptor(
+      name='r', full_name='service.Res.r', index=0,
       number=1, type=2, cpp_type=6, label=1,
       has_default_value=False, default_value=float(0),
       message_type=None, enum_type=None, containing_type=None,
@@ -91,12 +162,14 @@ _ACTION = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=79,
-  serialized_end=103,
+  serialized_start=152,
+  serialized_end=168,
 )
 
 DESCRIPTOR.message_types_by_name['StateReward'] = _STATEREWARD
 DESCRIPTOR.message_types_by_name['Action'] = _ACTION
+DESCRIPTOR.message_types_by_name['Metric'] = _METRIC
+DESCRIPTOR.message_types_by_name['Res'] = _RES
 _sym_db.RegisterFileDescriptor(DESCRIPTOR)
 
 StateReward = _reflection.GeneratedProtocolMessageType('StateReward', (_message.Message,), {
@@ -113,6 +186,20 @@ Action = _reflection.GeneratedProtocolMessageType('Action', (_message.Message,),
   })
 _sym_db.RegisterMessage(Action)
 
+Metric = _reflection.GeneratedProtocolMessageType('Metric', (_message.Message,), {
+  'DESCRIPTOR' : _METRIC,
+  '__module__' : 'StateAndReward_pb2'
+  # @@protoc_insertion_point(class_scope:service.Metric)
+  })
+_sym_db.RegisterMessage(Metric)
+
+Res = _reflection.GeneratedProtocolMessageType('Res', (_message.Message,), {
+  'DESCRIPTOR' : _RES,
+  '__module__' : 'StateAndReward_pb2'
+  # @@protoc_insertion_point(class_scope:service.Res)
+  })
+_sym_db.RegisterMessage(Res)
+
 
 DESCRIPTOR._options = None
 
@@ -123,8 +210,8 @@ _ACERSERVICE = _descriptor.ServiceDescriptor(
   index=0,
   serialized_options=None,
   create_key=_descriptor._internal_create_key,
-  serialized_start=105,
-  serialized_end=181,
+  serialized_start=170,
+  serialized_end=293,
   methods=[
   _descriptor.MethodDescriptor(
     name='GetExplorationAction',
@@ -133,6 +220,16 @@ _ACERSERVICE = _descriptor.ServiceDescriptor(
     containing_service=None,
     input_type=_STATEREWARD,
     output_type=_ACTION,
+    serialized_options=None,
+    create_key=_descriptor._internal_create_key,
+  ),
+  _descriptor.MethodDescriptor(
+    name='UpdateMetric',
+    full_name='service.acerService.UpdateMetric',
+    index=1,
+    containing_service=None,
+    input_type=_METRIC,
+    output_type=_RES,
     serialized_options=None,
     create_key=_descriptor._internal_create_key,
   ),

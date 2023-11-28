@@ -2,7 +2,7 @@
 """Client and server classes corresponding to protobuf-defined services."""
 import grpc
 
-import StateAndReward_pb2 as StateAndReward__pb2
+import grpc_pb.StateAndReward_pb2 as StateAndReward__pb2
 
 
 class acerServiceStub(object):
@@ -19,12 +19,23 @@ class acerServiceStub(object):
                 request_serializer=StateAndReward__pb2.StateReward.SerializeToString,
                 response_deserializer=StateAndReward__pb2.Action.FromString,
                 )
+        self.UpdateMetric = channel.unary_unary(
+                '/service.acerService/UpdateMetric',
+                request_serializer=StateAndReward__pb2.Metric.SerializeToString,
+                response_deserializer=StateAndReward__pb2.Res.FromString,
+                )
 
 
 class acerServiceServicer(object):
     """Missing associated documentation comment in .proto file."""
 
     def GetExplorationAction(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+    def UpdateMetric(self, request, context):
         """Missing associated documentation comment in .proto file."""
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
@@ -37,6 +48,11 @@ def add_acerServiceServicer_to_server(servicer, server):
                     servicer.GetExplorationAction,
                     request_deserializer=StateAndReward__pb2.StateReward.FromString,
                     response_serializer=StateAndReward__pb2.Action.SerializeToString,
+            ),
+            'UpdateMetric': grpc.unary_unary_rpc_method_handler(
+                    servicer.UpdateMetric,
+                    request_deserializer=StateAndReward__pb2.Metric.FromString,
+                    response_serializer=StateAndReward__pb2.Res.SerializeToString,
             ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
@@ -62,5 +78,22 @@ class acerService(object):
         return grpc.experimental.unary_unary(request, target, '/service.acerService/GetExplorationAction',
             StateAndReward__pb2.StateReward.SerializeToString,
             StateAndReward__pb2.Action.FromString,
+            options, channel_credentials,
+            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
+
+    @staticmethod
+    def UpdateMetric(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(request, target, '/service.acerService/UpdateMetric',
+            StateAndReward__pb2.Metric.SerializeToString,
+            StateAndReward__pb2.Res.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
